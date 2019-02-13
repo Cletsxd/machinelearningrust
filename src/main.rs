@@ -70,7 +70,7 @@ impl Matriz {
 				for k in 0..self.columns {
 					sum = self.vector[(i*self.columns)+k] * mat_b.vector[(k*mat_b.columns)+j] + sum;
 				}
-				mat_r.vector[(i*mat_b.columns)+j] = sum;
+				mat_r.vector.push(sum); //(i*mat_b.columns)+j] = sum;
 			}
 		}
 
