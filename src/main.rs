@@ -55,6 +55,7 @@ impl Matriz {
 		println!("{}", "]");
 	}
 
+	// TODO Cambiar a función global
 	fn dot(&self, mat_b: &Matriz) -> Matriz {
 		let mat_b = mat_b.copy();
 
