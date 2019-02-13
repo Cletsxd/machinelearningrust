@@ -1,3 +1,4 @@
+#[derive(Clone)]
 struct Matriz {
 	vector: Vec<f32>,
 	rows: usize,
@@ -58,7 +59,7 @@ impl Matriz {
 
 	// TODO Cambiar a función global
 	fn dot(&self, mat_b: &Matriz) -> Matriz {
-		let mat_b = mat_b.copy();
+		let mat_b = mat_b.clone();
 
 		let mut mat_r = Matriz::create_matriz(self.rows, mat_b.columns, Vec::with_capacity(self.rows*mat_b.columns));
 
@@ -79,6 +80,7 @@ impl Matriz {
 }
 
 // Incluye la capa de entrada, la cual solo tiene 'output', es decir, es la matriz del set de entrenamiento o de prueba
+#[derive(Clone)]
 struct NeuralLayer {
 	weights: Matriz,
 	bias: Matriz,
@@ -88,11 +90,11 @@ struct NeuralLayer {
 
 impl NeuralLayer {
 	fn create_neural_layer(weights: Matriz, bias: Matriz, deltas: Matriz, output: &Matriz) -> NeuralLayer {
-		NeuralLayer{weights, bias, deltas, output: output.copy()}
+		NeuralLayer{weights, bias, deltas, output: output.clone()}
 	}
 
 	fn set_output(&mut self, output: &Matriz) {
-		let mat = output.copy();
+		let mat = output.clone();
 		self.output = mat;
 	}
 }
