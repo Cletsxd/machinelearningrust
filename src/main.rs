@@ -150,9 +150,15 @@ impl NeuralNet {
 	}
 
 	fn think(&mut self) /*-> Matriz*/ {
-		for (i, j) in self.neural_net.iter().zip(self.neural_net.iter_mut().skip(1)) {
-			j.set_output(&i.output.dot(&j.weights));
+		let mut nnn = Vec::with_capacity(self.neural_net.len());
+
+		for (i, j) in self.neural_net.iter().zip(self.neural_net.iter().skip(1)) {
+			let mut l = j.clone();
+			l.set_output(&i.output.dot(&j.weights));
+			nnn.push(l);
 		}
+
+		self.neural_net = nnn;
 	}
 
 	fn train(&self, exp_input: Matriz) {
