@@ -62,7 +62,7 @@ impl Matriz {
 
 		let mut mat_r = Matriz::create_matriz(self.rows, mat_b.columns, Vec::with_capacity(self.rows*mat_b.columns));
 
-		assert!(self.columns != mat_b.rows);
+		assert_eq!(self.columns, mat_b.rows);
 		
 		for i in 0..self.rows {
 			for j in 0..mat_b.columns {
