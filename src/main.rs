@@ -27,6 +27,7 @@ impl Matriz {
 		Matriz {vector, rows, columns}
 	}
 
+	// TODO remove this implementation
 	fn copy(&self) -> Matriz {
 		let mut v = Vec::with_capacity(self.rows*self.columns);
 
