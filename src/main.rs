@@ -86,11 +86,12 @@ struct NeuralLayer {
 	bias: Matriz,
 	deltas: Matriz,
 	output: Matriz,
+	activation_fuction: Functions,
 }
 
 impl NeuralLayer {
-	fn create_neural_layer(weights: Matriz, bias: Matriz, deltas: Matriz, output: &Matriz) -> NeuralLayer {
-		NeuralLayer{weights, bias, deltas, output: output.clone()}
+	fn create_neural_layer(weights: Matriz, bias: Matriz, deltas: Matriz, output: &Matriz, activation_fuction: Functions) -> NeuralLayer {
+		NeuralLayer{weights, bias, deltas, output: output.clone(), activation_fuction}
 	}
 
 	fn set_output(&mut self, output: &Matriz) {
@@ -109,12 +110,12 @@ impl NeuralNet {
 
 		for (index, (i, j)) in topo_nn.iter().zip(topo_nn.iter().skip(1)).enumerate() {
 			if index==0 {
-				let nl1 = NeuralLayer::create_neural_layer(Matriz::create_matriz_null(), Matriz::create_matriz_null(), Matriz::create_matriz_null(), &input);
+				let nl1 = NeuralLayer::create_neural_layer(Matriz::create_matriz_null(), Matriz::create_matriz_null(), Matriz::create_matriz_null(), &input, Functions::Sigmoidal);
 				neural_net.push(nl1);
-				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null());
+				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Sigmoidal);
 				neural_net.push(nlm);
 			}else{
-				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null());
+				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Sigmoidal);
 				neural_net.push(nlm);
 			}
 		}
@@ -153,8 +154,9 @@ impl NeuralNet {
 
 	fn think(&mut self) /*-> Matriz*/ {
 		for (i, j) in (0..self.neural_net.len()).zip(1..self.neural_net.len()) {
-			let out = &self.neural_net[i].output.dot(&self.neural_net[j].weights);
-			self.neural_net[j].set_output(out);
+			let mut out = self.neural_net[i].output.dot(&self.neural_net[j].weights);
+			out = self.neural_net[j].activation_fuction.active(&out);
+			self.neural_net[j].set_output(&out);
 		}
 	}
 
@@ -170,6 +172,32 @@ fn random_number(min: i32, max: i32) -> f32 {
 	let x: f32 = rand::random();
 
 	dif as f32 * x + min as f32
+}
+
+#[derive(Clone, Copy)]
+enum Functions {
+	Sigmoidal,
+	Tanh,
+	Relu,
+}
+
+impl Functions {
+	fn active(&self, output: &Matriz) -> Matriz {
+		match self {
+			Functions::Sigmoidal => {
+				unimplemented!();
+			},
+
+			Functions::Tanh => {
+				unimplemented!();
+			},
+
+			Functions::Relu => {
+				unimplemented!();
+			},
+
+		}
+	}
 }
 
 fn main() {
