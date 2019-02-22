@@ -125,7 +125,13 @@ impl NeuralNet {
 
 	fn think(&mut self) /*-> Matriz*/ {
 		for (i, j) in (0..self.neural_net.len()).zip(1..self.neural_net.len()) {
+			// regresión lineal
 			let mut out = dot(&self.neural_net[i].output, &self.neural_net[j].weights);
+
+			// suma con bias
+			out = suma_wc(&out, &self.neural_net[j].bias);
+
+			// función de activación
 			out = self.neural_net[j].activation_fuction.active(&out);
 			self.neural_net[j].set_output(&out);
 		}
@@ -146,25 +152,43 @@ fn random_number(min: i32, max: i32) -> f32 {
 }
 
 fn dot(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
-		let mat_a = mat_a.clone();
-		let mat_b = mat_b.clone();
+	let mat_a = mat_a.clone();
+	let mat_b = mat_b.clone();
 
-		let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_b.columns, Vec::with_capacity(mat_a.rows*mat_b.columns));
+	let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_b.columns, Vec::with_capacity(mat_a.rows*mat_b.columns));
 
-		assert_eq!(mat_a.columns, mat_b.rows);
-		
-		for i in 0..mat_a.rows {
-			for j in 0..mat_b.columns {
-				let mut sum = 0.0;
-				for k in 0..mat_a.columns {
-					sum = mat_a.vector[(i*mat_a.columns)+k] * mat_b.vector[(k*mat_b.columns)+j] + sum;
-				}
-				mat_r.vector.push(sum);
+	assert_eq!(mat_a.columns, mat_b.rows);
+	
+	for i in 0..mat_a.rows {
+		for j in 0..mat_b.columns {
+			let mut sum = 0.0;
+			for k in 0..mat_a.columns {
+				sum = mat_a.vector[(i*mat_a.columns)+k] * mat_b.vector[(k*mat_b.columns)+j] + sum;
 			}
+			mat_r.vector.push(sum);
 		}
-
-		mat_r
 	}
+
+	mat_r
+}
+
+fn suma_wc(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
+	let mat_a = mat_a.clone();
+	let mat_b = mat_b.clone();
+
+	assert!(mat_a.rows != mat_b.rows);
+	assert_eq!(mat_a.columns, mat_b.columns);
+
+	let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_a.columns, Vec::with_capacity(mat_a.rows*mat_a.columns));
+
+	for i in 0..mat_a.rows {
+		for j in 0..mat_a.columns {
+			mat_r.vector.push(mat_a.vector[(i*mat_a.columns)+j] + mat_b.vector[j]);
+		}
+	}
+
+	mat_r
+}
 
 #[derive(Clone, Copy)]
 enum Functions {
