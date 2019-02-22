@@ -123,7 +123,7 @@ impl NeuralNet {
 		unimplemented!();
 	}
 
-	fn think(&mut self) /*-> Matriz*/ {
+	fn think(&mut self) {
 		for (i, j) in (0..self.neural_net.len()).zip(1..self.neural_net.len()) {
 			// regresión lineal
 			let mut out = dot(&self.neural_net[i].output, &self.neural_net[j].weights);
@@ -132,13 +132,18 @@ impl NeuralNet {
 			out = suma_wc(&out, &self.neural_net[j].bias);
 
 			// función de activación
-			out = self.neural_net[j].activation_fuction.active(&out);
+			out = self.neural_net[j].activation_fuction.active_f(&out);
 			self.neural_net[j].set_output(&out);
 		}
 	}
 
-	fn train(&self, exp_input: Matriz) {
+	fn backpropagation(&mut self, exp_input: &Matriz, learning_rate: f32) {
 		unimplemented!();
+	}
+
+	fn train(&mut self, exp_input: Matriz, /*epochs: usize, */learning_rate: f32) {
+		self.think();
+		self.backpropagation(&exp_input, learning_rate);
 	}
 }
 
@@ -198,7 +203,7 @@ enum Functions {
 }
 
 impl Functions {
-	fn active(&self, output: &Matriz) -> Matriz {
+	fn active_f(&self, output: &Matriz) -> Matriz {
 
 		let output = output.clone();
 
@@ -224,6 +229,31 @@ impl Functions {
 						mat_r.vector.push((exp_value1-exp_value2) as f32 /(exp_value1+exp_value2) as f32);
 					}
 		  		}
+			},
+
+			Functions::Relu => {
+				unimplemented!();
+			},
+
+		}
+
+		mat_r
+	}
+
+	fn derived_f(&self, output: &Matriz) -> Matriz {
+		let output = output.clone();
+
+		let mut mat_r = Matriz::create_matriz(output.rows, output.columns, Vec::with_capacity(output.rows*output.columns));
+
+		let e = f64::consts::E;
+
+		match self {
+			Functions::Sigmoidal => {
+				unimplemented!();
+			},
+
+			Functions::Tanh => {
+				unimplemented!();
 			},
 
 			Functions::Relu => {
@@ -266,11 +296,12 @@ fn main() {
 	ann.think();
 
 	// mostrar output final
+	print!("Final Output\n");
 	ann.show_final_output();
 
 	// mostrar todos los outputs
 	//ann.show_outputs();
 
 	// Training
-	ann.train(Y);
+	ann.train(Y, 0.01);
 }
