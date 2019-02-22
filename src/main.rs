@@ -123,7 +123,7 @@ impl NeuralNet {
 		unimplemented!();
 	}
 
-	fn think(&mut self) {
+	fn feed_forward(&mut self) {
 		for (i, j) in (0..self.neural_net.len()).zip(1..self.neural_net.len()) {
 			// regresión lineal
 			let mut out = dot(&self.neural_net[i].output, &self.neural_net[j].weights);
@@ -139,10 +139,40 @@ impl NeuralNet {
 
 	fn backpropagation(&mut self, exp_input: &Matriz, learning_rate: f32) {
 		unimplemented!();
+		/*
+		- Para cada capa:
+			- Si es la última capa:
+				- Calcular deltas última capa:
+					> Calcular error (e2medio = output layer - exp_input)
+					> Calcular deriv output layer
+					> Calcular delta layer: error * deriv
+			- Si no:
+				- Calcular deltas anteriores:
+					> Recuperación delta layer+1
+					> Recuperación weights layer+1
+					> Transposición weights layer+1 -> w_t layer+1
+					> Recuperación output layer
+					> Calcular do = deriv output layer
+					> Calcular mult_mat = dot(delta layer+1, w_t layer+1)
+					> Calcular delta layer: mult_mat * do
+
+			continue;
+
+			- Actualización de bias:
+				> Calcular mean = mean(deltas layer)
+				> Calcular mlr = mean * learning rate
+				> Actualizar bias layer
+			- Actualización de weights:
+				> Recuperación output layer-1
+				> Transposición output layer-1 -> out_t layer-1
+				> Calcular do = dot(out_t layer-1, delta layer)
+				> Calcular dlr = dot * learning_rate
+				> Actualizar weights layer
+		*/
 	}
 
 	fn train(&mut self, exp_input: Matriz, /*epochs: usize, */learning_rate: f32) {
-		self.think();
+		self.feed_forward();
 		self.backpropagation(&exp_input, learning_rate);
 	}
 }
@@ -293,9 +323,9 @@ fn main() {
 	ann.show();
 
 	// pensar (feed-forward)
-	ann.think();
+	ann.feed_forward();
 
-	// mostrar output final
+	// mostrar final output
 	print!("Final Output\n");
 	ann.show_final_output();
 
