@@ -1,3 +1,5 @@
+use std::f64;
+
 #[derive(Clone)]
 struct Matriz {
 	vector: Vec<f32>,
@@ -28,17 +30,6 @@ impl Matriz {
 		Matriz {vector, rows, columns}
 	}
 
-	// TODO remove this implementation
-	/*fn clone(&self) -> Matriz {
-		let mut v = Vec::with_capacity(self.rows*self.columns);
-
-		for i in self.vector.iter() {
-			v.push(*i);
-		}
-
-		Matriz::create_matriz(self.rows, self.columns, v)
-	}
-*/
 	fn show(&self) {
 		print!("{}", "[");
 		for i in 0..self.rows {
@@ -57,26 +48,6 @@ impl Matriz {
 		println!("{}", "]");
 	}
 
-	// TODO Cambiar a función global
-	fn dot(&self, mat_b: &Matriz) -> Matriz {
-		let mat_b = mat_b.clone();
-
-		let mut mat_r = Matriz::create_matriz(self.rows, mat_b.columns, Vec::with_capacity(self.rows*mat_b.columns));
-
-		assert_eq!(self.columns, mat_b.rows);
-		
-		for i in 0..self.rows {
-			for j in 0..mat_b.columns {
-				let mut sum = 0.0;
-				for k in 0..self.columns {
-					sum = self.vector[(i*self.columns)+k] * mat_b.vector[(k*mat_b.columns)+j] + sum;
-				}
-				mat_r.vector.push(sum); //(i*mat_b.columns)+j] = sum;
-			}
-		}
-
-		mat_r
-	}
 }
 
 // Incluye la capa de entrada, la cual solo tiene 'output', es decir, es la matriz del set de entrenamiento o de prueba
@@ -110,12 +81,12 @@ impl NeuralNet {
 
 		for (index, (i, j)) in topo_nn.iter().zip(topo_nn.iter().skip(1)).enumerate() {
 			if index==0 {
-				let nl1 = NeuralLayer::create_neural_layer(Matriz::create_matriz_null(), Matriz::create_matriz_null(), Matriz::create_matriz_null(), &input, Functions::Sigmoidal);
+				let nl1 = NeuralLayer::create_neural_layer(Matriz::create_matriz_null(), Matriz::create_matriz_null(), Matriz::create_matriz_null(), &input, Functions::Tanh);
 				neural_net.push(nl1);
-				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Sigmoidal);
+				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Tanh);
 				neural_net.push(nlm);
 			}else{
-				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Sigmoidal);
+				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Tanh);
 				neural_net.push(nlm);
 			}
 		}
@@ -154,7 +125,7 @@ impl NeuralNet {
 
 	fn think(&mut self) /*-> Matriz*/ {
 		for (i, j) in (0..self.neural_net.len()).zip(1..self.neural_net.len()) {
-			let mut out = self.neural_net[i].output.dot(&self.neural_net[j].weights);
+			let mut out = dot(&self.neural_net[i].output, &self.neural_net[j].weights);
 			out = self.neural_net[j].activation_fuction.active(&out);
 			self.neural_net[j].set_output(&out);
 		}
@@ -174,6 +145,27 @@ fn random_number(min: i32, max: i32) -> f32 {
 	dif as f32 * x + min as f32
 }
 
+fn dot(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
+		let mat_a = mat_a.clone();
+		let mat_b = mat_b.clone();
+
+		let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_b.columns, Vec::with_capacity(mat_a.rows*mat_b.columns));
+
+		assert_eq!(mat_a.columns, mat_b.rows);
+		
+		for i in 0..mat_a.rows {
+			for j in 0..mat_b.columns {
+				let mut sum = 0.0;
+				for k in 0..mat_a.columns {
+					sum = mat_a.vector[(i*mat_a.columns)+k] * mat_b.vector[(k*mat_b.columns)+j] + sum;
+				}
+				mat_r.vector.push(sum);
+			}
+		}
+
+		mat_r
+	}
+
 #[derive(Clone, Copy)]
 enum Functions {
 	Sigmoidal,
@@ -183,13 +175,31 @@ enum Functions {
 
 impl Functions {
 	fn active(&self, output: &Matriz) -> Matriz {
+
+		let output = output.clone();
+
+		let mut mat_r = Matriz::create_matriz(output.rows, output.columns, Vec::with_capacity(output.rows*output.columns));
+
+		let e = f64::consts::E;
+
 		match self {
 			Functions::Sigmoidal => {
-				unimplemented!();
+				for i in 0..output.rows {
+					for j in 0..output.columns {
+						let exp_value = e.powf(-output.vector[(i*output.columns)+j] as f64);
+						mat_r.vector.push(1_f32/(1_f32+exp_value as f32));
+					}
+		  		}
 			},
 
 			Functions::Tanh => {
-				unimplemented!();
+				for i in 0..output.rows {
+					for j in 0..output.columns {
+						let exp_value1 = e.powf(output.vector[(i*output.columns)+j] as f64);
+						let exp_value2 = e.powf(-output.vector[(i*output.columns)+j] as f64);
+						mat_r.vector.push((exp_value1-exp_value2) as f32 /(exp_value1+exp_value2) as f32);
+					}
+		  		}
 			},
 
 			Functions::Relu => {
@@ -197,6 +207,8 @@ impl Functions {
 			},
 
 		}
+
+		mat_r
 	}
 }
 
@@ -232,8 +244,8 @@ fn main() {
 	// mostrar output final
 	ann.show_final_output();
 
-	// mostrar el output de una layer
-	//ann.show_output(1);
+	// mostrar todos los outputs
+	//ann.show_outputs();
 
 	// Training
 	ann.train(Y);
