@@ -29,7 +29,7 @@ impl Matriz {
 	}
 
 	// TODO remove this implementation
-	fn copy(&self) -> Matriz {
+	/*fn clone(&self) -> Matriz {
 		let mut v = Vec::with_capacity(self.rows*self.columns);
 
 		for i in self.vector.iter() {
@@ -38,7 +38,7 @@ impl Matriz {
 
 		Matriz::create_matriz(self.rows, self.columns, v)
 	}
-
+*/
 	fn show(&self) {
 		print!("{}", "[");
 		for i in 0..self.rows {
@@ -94,8 +94,7 @@ impl NeuralLayer {
 	}
 
 	fn set_output(&mut self, output: &Matriz) {
-		let mat = output.clone();
-		self.output = mat;
+		self.output = output.clone();
 	}
 }
 
@@ -142,7 +141,10 @@ impl NeuralNet {
 	}
 
 	fn show_final_output(&self) {
-		unimplemented!();
+		match self.neural_net.last() {
+			Some(i) => i.output.show(),
+			None => print!("nada"),
+		}
 	}
 
 	fn show_output(&self, layer: usize) {
@@ -150,15 +152,10 @@ impl NeuralNet {
 	}
 
 	fn think(&mut self) /*-> Matriz*/ {
-		let mut nnn = Vec::with_capacity(self.neural_net.len());
-
-		for (i, j) in self.neural_net.iter().zip(self.neural_net.iter().skip(1)) {
-			let mut l = j.clone();
-			l.set_output(&i.output.dot(&j.weights));
-			nnn.push(l);
+		for (i, j) in (0..self.neural_net.len()).zip(1..self.neural_net.len()) {
+			let out = &self.neural_net[i].output.dot(&self.neural_net[j].weights);
+			self.neural_net[j].set_output(out);
 		}
-
-		self.neural_net = nnn;
 	}
 
 	fn train(&self, exp_input: Matriz) {
@@ -201,14 +198,14 @@ fn main() {
 	// mostrar ann
 	ann.show();
 
+	// pensar (feed-forward)
+	ann.think();
+
 	// mostrar output final
-	//ann.show_final_output();
+	ann.show_final_output();
 
 	// mostrar el output de una layer
 	//ann.show_output(1);
-
-	// pensar (feed-forward)
-	ann.think();
 
 	// Training
 	ann.train(Y);
