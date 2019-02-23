@@ -264,7 +264,7 @@ fn dot(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	let mat_a = mat_a.clone();
 	let mat_b = mat_b.clone();
 
-	let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_b.columns, Vec::with_capacity(mat_a.rows*mat_b.columns));
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_b.columns);
 
 	assert_eq!(mat_a.columns, mat_b.rows);
 	
@@ -274,7 +274,7 @@ fn dot(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 			for k in 0..mat_a.columns {
 				sum = mat_a.vector[(i*mat_a.columns)+k] * mat_b.vector[(k*mat_b.columns)+j] + sum;
 			}
-			mat_r.vector.push(sum);
+			mat_r.vector[(i*mat_b.columns)+j] = sum;
 		}
 	}
 
@@ -288,11 +288,11 @@ fn suma_wc(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	assert!(mat_a.rows != mat_b.rows);
 	assert_eq!(mat_a.columns, mat_b.columns);
 
-	let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_a.columns, Vec::with_capacity(mat_a.rows*mat_a.columns));
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
 
 	for i in 0..mat_a.rows {
 		for j in 0..mat_a.columns {
-			mat_r.vector.push(mat_a.vector[(i*mat_a.columns)+j] + mat_b.vector[j]);
+			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] + mat_b.vector[j];
 		}
 	}
 
@@ -306,11 +306,11 @@ fn d_e2medio(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	assert_eq!(mat_a.rows, mat_b.rows);
 	assert_eq!(mat_a.columns, mat_b.columns);
 
-	let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_a.columns, Vec::with_capacity(mat_a.rows*mat_a.columns));
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
 
 	for i in 0..mat_a.rows {
 		for j in 0..mat_a.columns {
-			mat_r.vector.push(mat_a.vector[(i*mat_a.columns)+j] - mat_b.vector[(i*mat_a.columns)+j]);
+			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] - mat_b.vector[(i*mat_a.columns)+j];
 		}
 	}
 
@@ -324,11 +324,11 @@ fn mult_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	assert_eq!(mat_a.rows, mat_b.rows);
 	assert_eq!(mat_a.columns, mat_b.columns);
 
-	let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_a.columns, Vec::with_capacity(mat_a.rows*mat_a.columns));
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
 
 	for i in 0..mat_a.rows {
 		for j in 0..mat_a.columns {
-			mat_r.vector.push(mat_a.vector[(i*mat_a.columns)+j] * mat_b.vector[(i*mat_a.columns)+j]);
+			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] * mat_b.vector[(i*mat_a.columns)+j];
 		}
 	}
 
@@ -345,7 +345,7 @@ fn mean(mat: &Matriz) -> Matriz {
 			mat_r.vector[j] = mat.vector[(i*mat.columns)+j] + mat_r.vector[j];
 		}
 	}
-	
+
 	for j in 0..mat.columns {
 		mat_r.vector[j] = mat.vector[j]/mat.rows as f32;
 	}
@@ -356,11 +356,11 @@ fn mean(mat: &Matriz) -> Matriz {
 fn mult_mat_float(mat: &Matriz, numberf: f32) -> Matriz {
 	let mat = mat.clone();
 
-	let mut mat_r = Matriz::create_matriz(mat.rows, mat.columns, Vec::with_capacity(mat.rows*mat.columns));
+	let mut mat_r = Matriz::create_matriz_zeros(mat.rows, mat.columns);
 
 	for i in 0..mat.rows {
 		for j in 0..mat.columns {
-			mat_r.vector.push(mat.vector[(i*mat.columns)+j] * numberf);
+			mat_r.vector[(i*mat.columns)+j] = mat.vector[(i*mat.columns)+j] * numberf;
 		}
 	}
 
@@ -379,7 +379,7 @@ impl Functions {
 
 		let output = output.clone();
 
-		let mut mat_r = Matriz::create_matriz(output.rows, output.columns, Vec::with_capacity(output.rows*output.columns));
+		let mut mat_r = Matriz::create_matriz_zeros(output.rows, output.columns);
 
 		let e = f64::consts::E;
 
@@ -388,7 +388,7 @@ impl Functions {
 				for i in 0..output.rows {
 					for j in 0..output.columns {
 						let exp_value = e.powf(-output.vector[(i*output.columns)+j] as f64);
-						mat_r.vector.push(1_f32/(1_f32+exp_value as f32));
+						mat_r.vector[(i*output.columns)+j] = 1_f32/(1_f32+exp_value as f32);
 					}
 		  		}
 			},
@@ -398,7 +398,7 @@ impl Functions {
 					for j in 0..output.columns {
 						let exp_value1 = e.powf(output.vector[(i*output.columns)+j] as f64);
 						let exp_value2 = e.powf(-output.vector[(i*output.columns)+j] as f64);
-						mat_r.vector.push((exp_value1-exp_value2) as f32 /(exp_value1+exp_value2) as f32);
+						mat_r.vector[(i*output.columns)+j] = (exp_value1-exp_value2) as f32 / (exp_value1+exp_value2) as f32;
 					}
 				}
 			},
@@ -419,13 +419,13 @@ impl Functions {
 	fn derived_f(&self, output: &Matriz) -> Matriz {
 		let output = output.clone();
 
-		let mut mat_r = Matriz::create_matriz(output.rows, output.columns, Vec::with_capacity(output.rows*output.columns));
+		let mut mat_r = Matriz::create_matriz_zeros(output.rows, output.columns);
 
 		match self {
 			Functions::Sigmoidal => {
 				for i in 0..output.rows {
 					for j in 0..output.columns {
-						mat_r.vector.push(output.vector[(i*output.columns)+j] * (1_f32 - output.vector[(i*output.columns)+j]));
+						mat_r.vector[(i*output.columns)+j] = output.vector[(i*output.columns)+j] * (1_f32 - output.vector[(i*output.columns)+j]);
 					}
 		  		}
 			},
@@ -433,7 +433,7 @@ impl Functions {
 			Functions::Tanh => {
 				for i in 0..output.rows {
 					for j in 0..output.columns {
-						mat_r.vector.push(1_f32 - (output.vector[(i*output.columns)+j].powf(2_f32) as f32));
+						mat_r.vector[(i*output.columns)+j] = 1_f32 - (output.vector[(i*output.columns)+j].powf(2_f32) as f32);
 					}
 				}
 			},
@@ -491,7 +491,7 @@ fn main() {
 	//ann.show_outputs();
 
 	// Training
-	ann.train(Y, 1, 0.01);
+	ann.train(Y, 2, 0.01);
 	
 	
 	// mostrar ann
