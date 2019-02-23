@@ -41,7 +41,6 @@ impl Matriz {
 	}
 
 	fn t(&self) -> Matriz {
-		self.show();
 		let mut mat_r = Matriz::create_matriz_zeros(self.columns, self.rows);
 
 		for i in 0..self.rows {
@@ -190,8 +189,6 @@ impl NeuralNet {
 
 				//> Calcular delta layer: error * deriv
 				self.neural_net[(i*-1) as usize].set_deltas(&mult_mat(&error, &deriv));
-				print!("\ndeltas\n");
-				self.neural_net[(i*-1) as usize].deltas.show();
 			} else {
 			//- Si no:
 				//- Calcular deltas anteriores:
@@ -202,9 +199,7 @@ impl NeuralNet {
 				let weights = &self.neural_net[(i*-1)as usize +1].weights.clone();
 
 				//> Transposición weights layer+1 -> w_t layer+1
-				print!("weights\n");
 				let weightst = weights.t();
-				weightst.show();
 
 				//> Recuperación output layer
 				let output = &self.neural_net[(i*-1) as usize].output.clone();
@@ -217,16 +212,12 @@ impl NeuralNet {
 
 				//> Calcular delta layer: mult_mat * doo
 				self.neural_net[(i*-1) as usize].set_deltas(&mult_mat(&mm, &doo));
-				print!("\ndeltas\n");
-				self.neural_net[(i*-1) as usize].deltas.show();
 			}
 			// sigue..
 
 			//- Actualización de bias:
 			//> Calcular mean = mean(deltas layer)
 			let mean = mean(&self.neural_net[(i*-1) as usize].deltas);
-			print!("\nmean\n");
-			mean.show();
 
 			//> Calcular mlr = mean * learning rate
 			let mlr = mult_mat_float(&mean, learning_rate);
@@ -239,9 +230,7 @@ impl NeuralNet {
 			let out = &self.neural_net[(j*-1) as usize].output.clone();
 
 			//> Transposición output layer-1 -> out_t layer-1
-			print!("output\n");
 			let outt = out.t();
-			outt.show();
 
 			//> Calcular do = dot(out_t layer-1, delta layer)
 			let dooo = dot(&outt, &self.neural_net[(i*-1) as usize].deltas);
@@ -353,12 +342,12 @@ fn mean(mat: &Matriz) -> Matriz {
 
 	for i in 0..mat.rows {
 		for j in 0..mat.columns {
-			mat_r.vector.push(mat.vector[(i*mat.columns)+j] + mat_r.vector[j]);
+			mat_r.vector[j] = mat.vector[(i*mat.columns)+j] + mat_r.vector[j];
 		}
 	}
-
+	
 	for j in 0..mat.columns {
-		mat_r.vector.push(mat.vector[j]/mat.rows as f32);
+		mat_r.vector[j] = mat.vector[j]/mat.rows as f32;
 	}
 
 	mat_r
