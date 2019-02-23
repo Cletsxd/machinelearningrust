@@ -18,6 +18,16 @@ impl Matriz {
 		Matriz {vector, rows, columns}
 	}
 
+	fn create_matriz_zeros(rows: usize, columns: usize) -> Matriz {
+		let mut vector = Vec::with_capacity(rows*columns);
+
+		for _i in 0..(rows*columns){
+			vector.push(0.0);
+		}
+
+		Matriz {vector, rows, columns}
+	}
+
 	fn create_matriz_null() -> Matriz {
 		let vector = Vec::with_capacity(0);
 		let rows = 0;
@@ -31,7 +41,15 @@ impl Matriz {
 	}
 
 	fn t(&self) -> Matriz {
-		unimplemented!();
+		let mut vector = Vec::with_capacity(self.columns*self.rows);
+
+		for i in 0..self.rows {
+			for j in 0..self.columns {
+				vector.push(self.vector[(i*self.columns)+j]);
+			}
+		}
+
+		Matriz {vector, rows: self.columns, columns: self.rows}
 	}
 
 	fn show(&self) {
@@ -159,70 +177,70 @@ impl NeuralNet {
 		//- Para cada capa:
 		for (i, j) in (ini..0).zip((ini+1)..1) {
 			//print!("{}, {}", i*-1, j*-1);
-			
+
 			//- Si es la última capa:
-			if (i+1)==ini {
+			if i==ini {
 				//- Calcular deltas última capa:
 				//> Calcular error (e2medio = output layer - exp_input)
-				let error = d_e2medio(&self.neural_net[(i*-1)].output, &exp_input);
+				let error = d_e2medio(&self.neural_net[(i*-1) as usize].output, &exp_input);
 
 				//> Calcular deriv output layer
-				let deriv = self.neural_net[(i*-1)].activation_fuction.derived_f(&self.neural_net[(i*-1)].output);
+				let deriv = self.neural_net[(i*-1) as usize].activation_fuction.derived_f(&self.neural_net[(i*-1) as usize].output);
 
 				//> Calcular delta layer: error * deriv
-				self.neural_net[(i*-1)].set_deltas(&mult_mat(&error, &deriv));
-			}		
+				self.neural_net[(i*-1) as usize].set_deltas(&mult_mat(&error, &deriv));
+			} else {
 			//- Si no:
-			else {
 				//- Calcular deltas anteriores:
 				//> Recuperación delta layer+1
-				let delta = self.neural_net[(i*-1)+1].deltas;
+				let delta = &self.neural_net[(i*-1) as usize +1].deltas.clone();
 
 				//> Recuperación weights layer+1
-				let weights = self.neural_net[(i*-1)+1].weights;
+				let weights = &self.neural_net[(i*-1)as usize +1].weights.clone();
 
 				//> Transposición weights layer+1 -> w_t layer+1
 				let weightst = weights.t();
 
 				//> Recuperación output layer
-				let output = self.neural_net[(i*-1)].output;
+				let output = &self.neural_net[(i*-1) as usize].output.clone();
 
 				//> Calcular doo = deriv output layer
-				let doo = self.neural_net[(i*-1)].activation_fuction.derived_f(&output);
+				let doo = self.neural_net[(i*-1) as usize].activation_fuction.derived_f(&output);
 
 				//> Calcular mult_mat = dot(delta layer+1, w_t layer+1)
 				let mm = dot(&delta, &weightst);
 
 				//> Calcular delta layer: mult_mat * doo
-				self.neural_net[(i*-1)].set_deltas(&mult_mat(&mm, &doo));
+				self.neural_net[(i*-1) as usize].set_deltas(&mult_mat(&mm, &doo));
 			}
 			// sigue..
 
 			//- Actualización de bias:
 			//> Calcular mean = mean(deltas layer)
-			let mean = mean(&self.neural_net[(i*-1)].deltas);
+			let mean = mean(&self.neural_net[(i*-1) as usize].deltas);
 
 			//> Calcular mlr = mean * learning rate
 			let mlr = mult_mat_float(&mean, learning_rate);
 
 			//> Actualizar bias layer
-			self.neural_net[(i*-1)].set_bias(&mlr);
+			self.neural_net[(i*-1) as usize].set_bias(&mlr);
 
 			//- Actualización de weights:
 			//> Recuperación output layer-1
-			let out = self.neural_net[(j*-1)].output;
+			let out = &self.neural_net[(j*-1) as usize].output.clone();
 
 			//> Transposición output layer-1 -> out_t layer-1
 			let outt = out.t();
+			outt.show();
 
 			//> Calcular do = dot(out_t layer-1, delta layer)
-			let dooo = dot(&outt, &self.neural_net[(i*-1)].deltas);
+			let dooo = dot(&outt, &self.neural_net[(i*-1) as usize].deltas);
 
 			//> Calcular dlr = dot * learning_rate
-			let dlr = mult_mat_float(&dooo, &learning_rate);
+			let dlr = mult_mat_float(&dooo, learning_rate);
 
 			//> Actualizar weights layer
-			self.neural_net[(i*-1)].set_weights(&dlr);
+			self.neural_net[(i*-1) as usize].set_weights(&dlr);
 		}
 	}
 
@@ -283,19 +301,71 @@ fn suma_wc(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 }
 
 fn d_e2medio(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
-	unimplemented!();
+	let mat_a = mat_a.clone();
+	let mat_b = mat_b.clone();
+
+	assert_eq!(mat_a.rows, mat_b.rows);
+	assert_eq!(mat_a.columns, mat_b.columns);
+
+	let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_a.columns, Vec::with_capacity(mat_a.rows*mat_a.columns));
+
+	for i in 0..mat_a.rows {
+		for j in 0..mat_a.columns {
+			mat_r.vector.push(mat_a.vector[(i*mat_a.columns)+j] - mat_b.vector[(i*mat_a.columns)+j]);
+		}
+	}
+
+	mat_r
 }
 
 fn mult_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
-	unimplemented!();
+	let mat_a = mat_a.clone();
+	let mat_b = mat_b.clone();
+
+	assert_eq!(mat_a.rows, mat_b.rows);
+	assert_eq!(mat_a.columns, mat_b.columns);
+
+	let mut mat_r = Matriz::create_matriz(mat_a.rows, mat_a.columns, Vec::with_capacity(mat_a.rows*mat_a.columns));
+
+	for i in 0..mat_a.rows {
+		for j in 0..mat_a.columns {
+			mat_r.vector.push(mat_a.vector[(i*mat_a.columns)+j] * mat_b.vector[(i*mat_a.columns)+j]);
+		}
+	}
+
+	mat_r
 }
 
 fn mean(mat: &Matriz) -> Matriz {
-	unimplemented!();
+	let mat = mat.clone();
+
+	let mut mat_r = Matriz::create_matriz_zeros(1, mat.columns);
+
+	for i in 0..mat.rows {
+		for j in 0..mat.columns {
+			mat_r.vector.push(mat.vector[(i*mat.columns)+j] + mat_r.vector[j]);
+		}
+	}
+
+	for j in 0..mat.columns {
+		mat_r.vector.push(mat.vector[j]/mat.rows as f32);
+	}
+
+	mat_r
 }
 
-fn mult_mat_float(mat: &Matriz, numberf: usize) -> Matriz {
-	unimplemented!();
+fn mult_mat_float(mat: &Matriz, numberf: f32) -> Matriz {
+	let mat = mat.clone();
+
+	let mut mat_r = Matriz::create_matriz(mat.rows, mat.columns, Vec::with_capacity(mat.rows*mat.columns));
+
+	for i in 0..mat.rows {
+		for j in 0..mat.columns {
+			mat_r.vector.push(mat.vector[(i*mat.columns)+j] * numberf);
+		}
+	}
+
+	mat_r
 }
 
 #[derive(Clone, Copy)]
@@ -354,11 +424,19 @@ impl Functions {
 
 		match self {
 			Functions::Sigmoidal => {
-				unimplemented!();
+				for i in 0..output.rows {
+					for j in 0..output.columns {
+						mat_r.vector.push(output.vector[(i*output.columns)+j] * (1_f32 - output.vector[(i*output.columns)+j]));
+					}
+		  		}
 			},
 
 			Functions::Tanh => {
-				unimplemented!();
+				for i in 0..output.rows {
+					for j in 0..output.columns {
+						mat_r.vector.push(1_f32 - (output.vector[(i*output.columns)+j].powf(2_f32) as f32));
+					}
+				}
 			},
 
 			Functions::Relu => {
@@ -415,4 +493,17 @@ fn main() {
 
 	// Training
 	ann.train(Y, 1, 0.01);
+	
+	
+	// mostrar ann
+	print!("\nNeural Net after training\n");
+	ann.show();
+
+	// pensar (feed-forward)
+	ann.feed_forward();
+
+	// mostrar final output
+	print!("Final Output\n");
+	ann.show_final_output();
+
 }
