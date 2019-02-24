@@ -115,12 +115,12 @@ impl NeuralNet {
 
 		for (index, (i, j)) in topo_nn.iter().zip(topo_nn.iter().skip(1)).enumerate() {
 			if index==0 {
-				let nl1 = NeuralLayer::create_neural_layer(Matriz::create_matriz_null(), Matriz::create_matriz_null(), Matriz::create_matriz_null(), &input, Functions::Tanh);
+				let nl1 = NeuralLayer::create_neural_layer(Matriz::create_matriz_null(), Matriz::create_matriz_null(), Matriz::create_matriz_null(), &input, Functions::Sigmoidal);
 				neural_net.push(nl1);
-				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Tanh);
+				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Sigmoidal);
 				neural_net.push(nlm);
 			}else{
-				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Tanh);
+				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Sigmoidal);
 				neural_net.push(nlm);
 			}
 		}
@@ -381,13 +381,12 @@ impl Functions {
 
 		let mut mat_r = Matriz::create_matriz_zeros(output.rows, output.columns);
 
-		let e = f64::consts::E;
-
 		match self {
 			Functions::Sigmoidal => {
 				for i in 0..output.rows {
 					for j in 0..output.columns {
-						let exp_value = e.powf(-output.vector[(i*output.columns)+j] as f64);
+						let val = -1_f32 * output.vector[(i*output.columns)+j];
+						let exp_value = val.exp();
 						mat_r.vector[(i*output.columns)+j] = 1_f32/(1_f32+exp_value as f32);
 					}
 		  		}
@@ -396,9 +395,7 @@ impl Functions {
 			Functions::Tanh => {
 				for i in 0..output.rows {
 					for j in 0..output.columns {
-						let exp_value1 = e.powf(output.vector[(i*output.columns)+j] as f64);
-						let exp_value2 = e.powf(-output.vector[(i*output.columns)+j] as f64);
-						mat_r.vector[(i*output.columns)+j] = (exp_value1-exp_value2) as f32 / (exp_value1+exp_value2) as f32;
+						mat_r.vector[(i*output.columns)+j] = output.vector[(i*output.columns)+j].tanh();
 					}
 				}
 			},
@@ -433,7 +430,8 @@ impl Functions {
 			Functions::Tanh => {
 				for i in 0..output.rows {
 					for j in 0..output.columns {
-						mat_r.vector[(i*output.columns)+j] = 1_f32 - (output.vector[(i*output.columns)+j].powf(2_f32) as f32);
+						
+						mat_r.vector[(i*output.columns)+j] = 1_f32 - (output.vector[(i*output.columns)+j].powf(2_f32));
 					}
 				}
 			},
