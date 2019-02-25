@@ -115,12 +115,12 @@ impl NeuralNet {
 
 		for (index, (i, j)) in topo_nn.iter().zip(topo_nn.iter().skip(1)).enumerate() {
 			if index==0 {
-				let nl1 = NeuralLayer::create_neural_layer(Matriz::create_matriz_null(), Matriz::create_matriz_null(), Matriz::create_matriz_null(), &input, Functions::Sigmoidal);
+				let nl1 = NeuralLayer::create_neural_layer(Matriz::create_matriz_null(), Matriz::create_matriz_null(), Matriz::create_matriz_null(), &input, Functions::Tanh);
 				neural_net.push(nl1);
-				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Sigmoidal);
+				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Tanh);
 				neural_net.push(nlm);
 			}else{
-				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Sigmoidal);
+				let nlm = NeuralLayer::create_neural_layer(Matriz::create_matriz_random(*i,*j), Matriz::create_matriz_random(1,*j), Matriz::create_matriz_null(), &Matriz::create_matriz_null(), Functions::Tanh);
 				neural_net.push(nlm);
 			}
 		}
@@ -253,8 +253,9 @@ impl NeuralNet {
 			mlr.show();*/
 
 			//> Actualizar bias layer
-			let b = self.neural_net[(i*-1) as usize].bias;
-			self.neural_net[(i*-1) as usize].set_bias(&resta_mat(&b, &mlr));
+			let b = &self.neural_net[(i*-1) as usize].bias;
+			let nb = resta_mat(&b, &mlr);
+			self.neural_net[(i*-1) as usize].set_bias(&nb);
 
 			//- Actualización de weights:
 			//print!("-> actualización de weights\n");
@@ -281,8 +282,9 @@ impl NeuralNet {
 			dlr.show();*/
 
 			//> Actualizar weights layer
-			let w = self.neural_net[(i*-1) as usize].weights;
-			self.neural_net[(i*-1) as usize].set_weights(&resta_mat(&w, &dlr));
+			let w = &self.neural_net[(i*-1) as usize].weights;
+			let nw = resta_mat(&w, &dlr);
+			self.neural_net[(i*-1) as usize].set_weights(&nw);
 		}
 	}
 
@@ -550,8 +552,7 @@ fn main() {
 	//ann.show_outputs();
 
 	// Training
-	ann.train(Y, 2, 0.01);
-	
+	ann.train(Y, 2000, 0.1);
 	
 	// mostrar ann
 	print!("\nNeural Net after training\n");
