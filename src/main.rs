@@ -353,7 +353,7 @@ fn resta_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 
 	for i in 0..mat_a.rows {
 		for j in 0..mat_a.columns {
-			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] - mat_b.vector[j];
+			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] - mat_b.vector[(i*mat_a.columns)+j];
 		}
 	}
 
