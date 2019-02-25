@@ -177,69 +177,112 @@ impl NeuralNet {
 		//- Para cada capa:
 		for (i, j) in (ini..0).zip((ini+1)..1) {
 			//print!("{}, {}", i*-1, j*-1);
+			//print!("\n\n > Actualizando layer {}\n", i*-1);
 
 			//- Si es la última capa:
 			if i==ini {
 				//- Calcular deltas última capa:
 				//> Calcular error (e2medio = output layer - exp_input)
 				let error = d_e2medio(&self.neural_net[(i*-1) as usize].output, &exp_input);
+				/*print!("- e2medio\n");
+				error.show();*/
 
 				//> Calcular deriv output layer
 				let deriv = self.neural_net[(i*-1) as usize].activation_fuction.derived_f(&self.neural_net[(i*-1) as usize].output);
+				/*print!("- output layer\n");
+				self.neural_net[(i*-1) as usize].output.show();
+				print!("- deriv\n");
+				deriv.show();*/
 
 				//> Calcular delta layer: error * deriv
 				self.neural_net[(i*-1) as usize].set_deltas(&mult_mat(&error, &deriv));
+				/*print!("- nuevas deltas\n");
+				mult_mat(&error, &deriv).show();*/
 			} else {
 			//- Si no:
 				//- Calcular deltas anteriores:
 				//> Recuperación delta layer+1
 				let delta = &self.neural_net[(i*-1) as usize +1].deltas.clone();
+				/*print!("- deltas layer +1\n");
+				delta.show();*/
 
 				//> Recuperación weights layer+1
 				let weights = &self.neural_net[(i*-1)as usize +1].weights.clone();
+				/*print!("- weights layer +1\n");
+				weights.show();*/
 
 				//> Transposición weights layer+1 -> w_t layer+1
 				let weightst = weights.t();
+				/*print!("- weightst layer +1\n");
+				weightst.show();*/
 
 				//> Recuperación output layer
 				let output = &self.neural_net[(i*-1) as usize].output.clone();
+				/*print!("- output\n");
+				output.show();*/
 
 				//> Calcular doo = deriv output layer
 				let doo = self.neural_net[(i*-1) as usize].activation_fuction.derived_f(&output);
+				/*print!("- deriv\n");
+				doo.show();*/
 
 				//> Calcular mult_mat = dot(delta layer+1, w_t layer+1)
 				let mm = dot(&delta, &weightst);
+				/*print!("- dot\n");
+				mm.show();*/
 
 				//> Calcular delta layer: mult_mat * doo
 				self.neural_net[(i*-1) as usize].set_deltas(&mult_mat(&mm, &doo));
+				/*print!("- nuevas deltas\n");
+				mult_mat(&mm, &doo).show();*/
 			}
 			// sigue..
 
+			// Descenso del Gradiente
+
 			//- Actualización de bias:
+			//print!("-> actualización de bias\n");
 			//> Calcular mean = mean(deltas layer)
 			let mean = mean(&self.neural_net[(i*-1) as usize].deltas);
+			/*print!("- mean\n");
+			mean.show();*/
 
 			//> Calcular mlr = mean * learning rate
 			let mlr = mult_mat_float(&mean, learning_rate);
+			/*print!("- nuevas bias\n");
+			mlr.show();*/
 
 			//> Actualizar bias layer
-			self.neural_net[(i*-1) as usize].set_bias(&mlr);
+			let b = self.neural_net[(i*-1) as usize].bias;
+			self.neural_net[(i*-1) as usize].set_bias(&resta_mat(&b, &mlr));
 
 			//- Actualización de weights:
+			//print!("-> actualización de weights\n");
 			//> Recuperación output layer-1
 			let out = &self.neural_net[(j*-1) as usize].output.clone();
+			/*print!("- output layer -1\n");
+			out.show();*/
 
 			//> Transposición output layer-1 -> out_t layer-1
 			let outt = out.t();
+			/*print!("- outt layer -1\n");
+			outt.show();*/
 
 			//> Calcular do = dot(out_t layer-1, delta layer)
 			let dooo = dot(&outt, &self.neural_net[(i*-1) as usize].deltas);
+			/*print!("- deltas layer\n");
+			self.neural_net[(i*-1) as usize].deltas.show();
+			print!("- dooo (outt layer -1 @ deltas layer)\n");
+			dooo.show();*/
 
 			//> Calcular dlr = dot * learning_rate
 			let dlr = mult_mat_float(&dooo, learning_rate);
+			/*print!("- nuevas weights\n");
+			dlr.show();*/
 
 			//> Actualizar weights layer
-			self.neural_net[(i*-1) as usize].set_weights(&dlr);
+			let w = self.neural_net[(i*-1) as usize].weights;
+			self.neural_net[(i*-1) as usize].set_weights(&resta_mat(&w, &dlr));
 		}
 	}
 
@@ -299,6 +342,24 @@ fn suma_wc(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	mat_r
 }
 
+fn resta_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
+	let mat_a = mat_a.clone();
+	let mat_b = mat_b.clone();
+
+	assert_eq!(mat_a.columns, mat_b.columns);
+	assert_eq!(mat_a.rows, mat_b.rows);
+
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
+
+	for i in 0..mat_a.rows {
+		for j in 0..mat_a.columns {
+			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] - mat_b.vector[j];
+		}
+	}
+
+	mat_r
+}
+
 fn d_e2medio(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	let mat_a = mat_a.clone();
 	let mat_b = mat_b.clone();
@@ -347,7 +408,7 @@ fn mean(mat: &Matriz) -> Matriz {
 	}
 
 	for j in 0..mat.columns {
-		mat_r.vector[j] = mat.vector[j]/mat.rows as f32;
+		mat_r.vector[j] = mat_r.vector[j]/mat.rows as f32;
 	}
 
 	mat_r
