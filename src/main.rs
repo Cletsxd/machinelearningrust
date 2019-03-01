@@ -9,6 +9,7 @@ use neural_net::NeuralNet;
 fn main() {
 	//rustup doc --std
 	//rustup doc --book
+	// git checkout master
 	// Sobre la red
 
 	// PROBAR XOR //

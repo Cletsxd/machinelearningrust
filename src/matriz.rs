@@ -69,4 +69,12 @@ impl Matriz {
 		}
 		println!("{}", "]");
 	}
+
+	pub fn columns(&self) -> usize {
+		self.columns
+	}
+
+	pub fn rows(&self) -> usize {
+		self.vector.len() / self.columns
+	}
 }
