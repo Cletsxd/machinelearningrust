@@ -170,6 +170,23 @@ impl NeuralNet {
 		}
 	}
 
+	fn feed_forward_wi(&mut self, input: &Matriz) {
+		let input = input.clone();
+
+		for i in 1..self.neural_net.len() {
+			// regresión lineal
+			let mut out = dot(&input, &self.neural_net[i].weights);
+
+			// suma con bias
+			out = suma_wc(&out, &self.neural_net[i].bias);
+
+			// función de activación
+			out = self.neural_net[i].activation_fuction.active_f(&out);
+
+			self.neural_net[i].set_output(&out);
+		}
+	}
+
 	fn backpropagation(&mut self, exp_input: &Matriz, learning_rate: f32) {
 		let ini = (-1 * self.neural_net.len() as i32) +1;
 		let exp_input = exp_input.clone();
@@ -290,7 +307,7 @@ fn suma_wc(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	let mat_a = mat_a.clone();
 	let mat_b = mat_b.clone();
 
-	assert!(mat_a.rows != mat_b.rows);
+	//assert!(mat_a.rows != mat_b.rows);
 	assert_eq!(mat_a.columns, mat_b.columns);
 
 	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
@@ -424,10 +441,6 @@ impl Functions {
 			},
 
 			Functions::Relu => {
-				/*
-				def ReLU(x):
-    				return x * (x > 0)
-				*/
 				for i in 0..output.rows {
 					for j in 0..output.columns {
 						if output.vector[(i*output.columns)+j] > 0.0 {
@@ -468,10 +481,6 @@ impl Functions {
 			},
 
 			Functions::Relu => {
-				/*
-				def dReLU(x):
-    				return 1. * (x > 0)
-				*/
 				for i in 0..output.rows {
 					for j in 0..output.columns {
 						if output.vector[(i*output.columns)+j] > 0.0 {
@@ -493,18 +502,37 @@ fn main() {
 	//rustup doc --std
 	//rustup doc --book
 	// Sobre la red
-	let layers = 3;
+
+	// PROBAR XOR //
+	/*let layers = 3;
 	let mut topo_nn = Vec::with_capacity(layers);
-	topo_nn = [2, 3, 1].to_vec();
+	topo_nn = [2, 3, 1].to_vec();*/
 
 	// Sobre los datos de entrada de entrenamiento
-	let rows_x = 4;
+	/*let rows_x = 4;
 	let columns_x = 2;
 	let mut vec_x = Vec::with_capacity(rows_x*columns_x);
 	vec_x = [0.0,0.0, 1.0,0.0, 0.0,1.0, 1.0,1.0].to_vec();
-	let X = Matriz::create_matriz(rows_x, columns_x, vec_x);
+	let X = Matriz::create_matriz(rows_x, columns_x, vec_x);*/
 
 	// Sobre los datos de salida esperada
+	/*let rows_y = 4;
+	let columns_y = 1;
+	let mut vec_y = Vec::with_capacity(rows_y*columns_y);
+	vec_y = [0.0, 1.0, 1.0, 0.0].to_vec();
+	let Y = Matriz::create_matriz(rows_y, columns_y, vec_y);*/
+
+	// PROBAR UN SOLO PERCEPTRÓN //
+	/*let layers = 2;
+	let mut topo_nn = Vec::with_capacity(layers);
+	topo_nn = [3, 1].to_vec();
+
+	let rows_x = 4;
+	let columns_x = 3;
+	let mut vec_x = Vec::with_capacity(rows_x*columns_x);
+	vec_x = [0.0,0.0,1.0, 1.0,1.0,1.0, 1.0,0.0,1.0, 0.0,1.0,1.0].to_vec();
+	let X = Matriz::create_matriz(rows_x, columns_x, vec_x);
+
 	let rows_y = 4;
 	let columns_y = 1;
 	let mut vec_y = Vec::with_capacity(rows_y*columns_y);
@@ -512,23 +540,44 @@ fn main() {
 	let Y = Matriz::create_matriz(rows_y, columns_y, vec_y);
 
 	// Creación de la ANN
+	let mut ann = NeuralNet::create_neural_net(layers, X, topo_nn);*/
+
+	// PROBAR COCHE AUTOMÁTICO //
+	let layers = 3;
+	let mut topo_nn = Vec::with_capacity(layers);
+	topo_nn = [2, 3, 2].to_vec();
+
+	let rows_x = 7;
+	let columns_x = 2;
+	let mut vec_x = Vec::with_capacity(rows_x*columns_x);
+	vec_x = [0.0,0.0, 0.0,1.0, 0.0,-1.0, 0.5,1.0, 0.5,-1.0, 1.0,1.0, 1.0,-1.0].to_vec();
+	let X = Matriz::create_matriz(rows_x, columns_x, vec_x);
+
+	let rows_y = 7;
+	let columns_y = 2;
+	let mut vec_y = Vec::with_capacity(rows_y*columns_y);
+	vec_y = [0.0,1.0, 0.0,1.0, 0.0,1.0, -1.0,1.0, 1.0,1.0, 0.0,-1.0, 0.0,-1.0].to_vec();
+	let Y = Matriz::create_matriz(rows_y, columns_y, vec_y);
+
+	// Creación de la ANN
 	let mut ann = NeuralNet::create_neural_net(layers, X, topo_nn);
 
 	// mostrar ann
-	ann.show();
+	/*ann.show();
 
 	// pensar (feed-forward)
 	ann.feed_forward();
 
 	// mostrar final output
 	print!("Final Output\n");
-	ann.show_final_output();
+	ann.show_final_output();*/
 
 	// mostrar todos los outputs
 	//ann.show_outputs();
 
 	// Training
-	ann.train(Y.clone(), 20000, 0.1);
+	print!("\nTraining...\n");
+	ann.train(Y.clone(), 15000, 0.03);
 	
 	// mostrar ann
 	print!("\nNeural Net after training\n");
@@ -544,4 +593,19 @@ fn main() {
 	print!("\nExpected Output\n");
 	Y.show();
 
+	// PROBAR UN SOLO PERCEPTRÓN
+	// nueva entrada
+	/*let r = 1;
+	let c = 3;
+	let mut nvec = Vec::with_capacity(r*c);
+	nvec = [1.0,0.0,0.0].to_vec();
+	let nx = Matriz::create_matriz(r, c, nvec);
+
+	ann.feed_forward_wi(&nx);
+
+	print!("\nNew input\n");
+	nx.show();
+	// mostrar final output
+	print!("\nFinal Output\n");
+	ann.show_final_output();*/
 }
