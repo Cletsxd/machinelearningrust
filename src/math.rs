@@ -13,17 +13,17 @@ pub fn dot(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	let mat_a = mat_a.clone();
 	let mat_b = mat_b.clone();
 
-	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_b.columns);
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows(), mat_b.columns());
 
-	assert_eq!(mat_a.columns, mat_b.rows);
+	assert_eq!(mat_a.columns(), mat_b.rows());
 	
-	for i in 0..mat_a.rows {
-		for j in 0..mat_b.columns {
+	for i in 0..mat_a.rows() {
+		for j in 0..mat_b.columns() {
 			let mut sum = 0.0;
-			for k in 0..mat_a.columns {
-				sum = mat_a.vector[(i*mat_a.columns)+k] * mat_b.vector[(k*mat_b.columns)+j] + sum;
+			for k in 0..mat_a.columns() {
+				sum = mat_a.vector[(i*mat_a.columns())+k] * mat_b.vector[(k*mat_b.columns())+j] + sum;
 			}
-			mat_r.vector[(i*mat_b.columns)+j] = sum;
+			mat_r.vector[(i*mat_b.columns())+j] = sum;
 		}
 	}
 
@@ -34,14 +34,14 @@ pub fn suma_wc(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	let mat_a = mat_a.clone();
 	let mat_b = mat_b.clone();
 
-	//assert!(mat_a.rows != mat_b.rows);
-	assert_eq!(mat_a.columns, mat_b.columns);
+	//assert!(mat_a.rows() != mat_b.rows());
+	assert_eq!(mat_a.columns(), mat_b.columns());
 
-	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows(), mat_a.columns());
 
-	for i in 0..mat_a.rows {
-		for j in 0..mat_a.columns {
-			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] + mat_b.vector[j];
+	for i in 0..mat_a.rows() {
+		for j in 0..mat_a.columns() {
+			mat_r.vector[(i*mat_a.columns())+j] = mat_a.vector[(i*mat_a.columns())+j] + mat_b.vector[j];
 		}
 	}
 
@@ -52,14 +52,14 @@ pub fn resta_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	let mat_a = mat_a.clone();
 	let mat_b = mat_b.clone();
 
-	assert_eq!(mat_a.columns, mat_b.columns);
-	assert_eq!(mat_a.rows, mat_b.rows);
+	assert_eq!(mat_a.columns(), mat_b.columns());
+	assert_eq!(mat_a.rows(), mat_b.rows());
 
-	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows(), mat_a.columns());
 
-	for i in 0..mat_a.rows {
-		for j in 0..mat_a.columns {
-			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] - mat_b.vector[(i*mat_a.columns)+j];
+	for i in 0..mat_a.rows() {
+		for j in 0..mat_a.columns() {
+			mat_r.vector[(i*mat_a.columns())+j] = mat_a.vector[(i*mat_a.columns())+j] - mat_b.vector[(i*mat_a.columns())+j];
 		}
 	}
 
@@ -71,14 +71,14 @@ pub fn d_e2medio(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	let mat_a = mat_a.clone();
 	let mat_b = mat_b.clone();
 
-	assert_eq!(mat_a.rows, mat_b.rows);
-	assert_eq!(mat_a.columns, mat_b.columns);
+	assert_eq!(mat_a.rows(), mat_b.rows());
+	assert_eq!(mat_a.columns(), mat_b.columns());
 
-	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows(), mat_a.columns());
 
-	for i in 0..mat_a.rows {
-		for j in 0..mat_a.columns {
-			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] - mat_b.vector[(i*mat_a.columns)+j];
+	for i in 0..mat_a.rows() {
+		for j in 0..mat_a.columns() {
+			mat_r.vector[(i*mat_a.columns())+j] = mat_a.vector[(i*mat_a.columns())+j] - mat_b.vector[(i*mat_a.columns())+j];
 		}
 	}
 
@@ -89,14 +89,14 @@ pub fn mult_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 	let mat_a = mat_a.clone();
 	let mat_b = mat_b.clone();
 
-	assert_eq!(mat_a.rows, mat_b.rows);
-	assert_eq!(mat_a.columns, mat_b.columns);
+	assert_eq!(mat_a.rows(), mat_b.rows());
+	assert_eq!(mat_a.columns(), mat_b.columns());
 
-	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows, mat_a.columns);
+	let mut mat_r = Matriz::create_matriz_zeros(mat_a.rows(), mat_a.columns());
 
-	for i in 0..mat_a.rows {
-		for j in 0..mat_a.columns {
-			mat_r.vector[(i*mat_a.columns)+j] = mat_a.vector[(i*mat_a.columns)+j] * mat_b.vector[(i*mat_a.columns)+j];
+	for i in 0..mat_a.rows() {
+		for j in 0..mat_a.columns() {
+			mat_r.vector[(i*mat_a.columns())+j] = mat_a.vector[(i*mat_a.columns())+j] * mat_b.vector[(i*mat_a.columns())+j];
 		}
 	}
 
@@ -106,16 +106,16 @@ pub fn mult_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 pub fn mean(mat: &Matriz) -> Matriz {
 	let mat = mat.clone();
 
-	let mut mat_r = Matriz::create_matriz_zeros(1, mat.columns);
+	let mut mat_r = Matriz::create_matriz_zeros(1, mat.columns());
 
-	for i in 0..mat.rows {
-		for j in 0..mat.columns {
-			mat_r.vector[j] = mat.vector[(i*mat.columns)+j] + mat_r.vector[j];
+	for i in 0..mat.rows() {
+		for j in 0..mat.columns() {
+			mat_r.vector[j] = mat.vector[(i*mat.columns())+j] + mat_r.vector[j];
 		}
 	}
 
-	for j in 0..mat.columns {
-		mat_r.vector[j] = mat_r.vector[j]/mat.rows as f32;
+	for j in 0..mat.columns() {
+		mat_r.vector[j] = mat_r.vector[j]/mat.rows() as f32;
 	}
 
 	mat_r
@@ -124,11 +124,11 @@ pub fn mean(mat: &Matriz) -> Matriz {
 pub fn mult_mat_float(mat: &Matriz, numberf: f32) -> Matriz {
 	let mat = mat.clone();
 
-	let mut mat_r = Matriz::create_matriz_zeros(mat.rows, mat.columns);
+	let mut mat_r = Matriz::create_matriz_zeros(mat.rows(), mat.columns());
 
-	for i in 0..mat.rows {
-		for j in 0..mat.columns {
-			mat_r.vector[(i*mat.columns)+j] = mat.vector[(i*mat.columns)+j] * numberf;
+	for i in 0..mat.rows() {
+		for j in 0..mat.columns() {
+			mat_r.vector[(i*mat.columns())+j] = mat.vector[(i*mat.columns())+j] * numberf;
 		}
 	}
 

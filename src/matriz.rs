@@ -2,7 +2,7 @@ use crate::math::random_number;
 
 #[derive(Clone)]
 pub struct Matriz {
-	vector: Vec<f32>,
+	pub vector: Vec<f32>,
 	rows: usize,
 	columns: usize,
 }
