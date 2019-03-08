@@ -91,7 +91,7 @@ impl Index<(usize, usize)> for Matriz {
 }
 
 impl IndexMut<(usize, usize)> for Matriz {
-    fn index_mut<'a>(&'a mut self, (i, j): (usize, usize)) -> &'a mut f32 {
+    fn index_mut(&mut self, (i, j): (usize, usize)) -> &mut f32 {
         &mut self.vector[self.columns*i + j]
     }
 }
