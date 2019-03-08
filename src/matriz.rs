@@ -4,7 +4,6 @@ use std::ops::Index;
 #[derive(Clone)]
 pub struct Matriz {
 	pub vector: Vec<f32>,
-	rows: usize,
 	columns: usize,
 }
 
@@ -16,7 +15,7 @@ impl Matriz {
 			vector.push(random_number(-1,1));
 		}
 
-		Matriz {vector, rows, columns}
+		Matriz {vector, columns}
 	}
 
 	pub fn create_matriz_zeros(rows: usize, columns: usize) -> Matriz {
@@ -26,7 +25,7 @@ impl Matriz {
 			vector.push(0.0);
 		}
 
-		Matriz {vector, rows, columns}
+		Matriz {vector, columns}
 	}
 
 	pub fn create_matriz_null() -> Matriz {
@@ -34,19 +33,19 @@ impl Matriz {
 		let rows = 0;
 		let columns = 0;
 
-		Matriz {vector, rows, columns}
+		Matriz {vector, columns}
 	}
 
 	pub fn create_matriz(rows: usize, columns: usize, vector: Vec<f32>) -> Matriz {
-		Matriz {vector, rows, columns}
+		Matriz {vector, columns}
 	}
 
 	pub fn t(&self) -> Matriz {
-		let mut mat_r = Matriz::create_matriz_zeros(self.columns, self.rows);
+		let mut mat_r = Matriz::create_matriz_zeros(self.columns, self.rows());
 
-		for i in 0..self.rows {
+		for i in 0..self.rows() {
 			for j in 0..self.columns {
-				mat_r.vector[(j*self.rows)+i] = self.vector[(i*self.columns)+j];
+				mat_r.vector[(j*self.rows())+i] = self.vector[(i*self.columns)+j];
 			}
 		}
 
@@ -55,7 +54,7 @@ impl Matriz {
 
 	pub fn show(&self) {
 		print!("{}", "[");
-		for i in 0..self.rows {
+		for i in 0..self.rows() {
 			print!("{}", "[");
 			for j in 0..self.columns {
 				print!("{}", self.vector[(i*self.columns)+j]);
@@ -64,7 +63,7 @@ impl Matriz {
 				}
 			}
 			print!("{}", "]");
-			if i!=self.rows-1 {
+			if i!=self.rows()-1 {
 				println!("{}", ", ");
 			}
 		}
@@ -84,7 +83,7 @@ impl Index<(usize, usize)> for Matriz {
     type Output = f32;
 
     fn index(&self, (i, j): (usize, usize)) -> &f32 {
-        assert!(i < self.rows);
+        assert!(i < self.rows());
         assert!(j < self.columns);
 
         &self.vector[self.columns*i + j]
