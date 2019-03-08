@@ -1,4 +1,5 @@
 use crate::math::random_number;
+use std::ops::Index;
 
 #[derive(Clone)]
 pub struct Matriz {
@@ -77,4 +78,34 @@ impl Matriz {
 	pub fn rows(&self) -> usize {
 		self.vector.len() / self.columns
 	}
+}
+
+impl Index<(usize, usize)> for Matriz {
+    type Output = f32;
+
+    fn index(&self, (i, j): (usize, usize)) -> &f32 {
+        assert!(i < self.rows);
+        assert!(j < self.columns);
+
+        &self.vector[self.columns*i + j]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Matriz;
+
+    #[test]
+    fn test_matrix_index() {
+        let m = Matriz::create_matriz(3, 4, vec![
+            1.0, 0.0, 0.0, 2.0,
+            0.0, 0.0, 0.0, 0.0,
+            3.0, 0.0, 0.0, 4.0,
+        ]);
+
+        assert_eq!(m[(0,0)], 1.0);
+        assert_eq!(m[(0,3)], 2.0);
+        assert_eq!(m[(2,0)], 3.0);
+        assert_eq!(m[(2,3)], 4.0);
+    }
 }
