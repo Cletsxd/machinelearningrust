@@ -45,7 +45,7 @@ impl Matriz {
 
 		for i in 0..self.rows() {
 			for j in 0..self.columns {
-				mat_r.vector[(j*self.rows())+i] = self.vector[(i*self.columns)+j];
+				mat_r.vector[(j*self.rows())+i] = self[(i, j)];
 			}
 		}
 
@@ -57,7 +57,7 @@ impl Matriz {
 		for i in 0..self.rows() {
 			print!("{}", "[");
 			for j in 0..self.columns {
-				print!("{}", self.vector[(i*self.columns)+j]);
+				print!("{}", self[(i, j)]);
 				if j!=self.columns-1 {
 					print!("{}", ", ");
 				}
@@ -116,5 +116,27 @@ mod tests_matriz {
         m[(1, 1)] = 7.0;
 
         assert_eq!(m[(1,1)], 7.0);
+    }
+
+    #[test]
+    fn test_show() {
+    	let mut m = Matriz::create_matriz(3, 4, vec![
+            1.0, 0.0, 0.0, 2.0,
+            0.0, 0.0, 0.0, 0.0,
+            3.0, 0.0, 0.0, 4.0,
+        ]);
+
+        m.show();
+    }
+
+    #[test]
+    fn test_t() {
+    	let mut m = Matriz::create_matriz(3, 4, vec![
+            1.0, 0.0, 0.0, 2.0,
+            0.0, 0.0, 0.0, 0.0,
+            3.0, 0.0, 0.0, 4.0,
+        ]);
+
+        let mt = m.t();
     }
 }
