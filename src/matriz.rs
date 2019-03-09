@@ -97,7 +97,7 @@ impl IndexMut<(usize, usize)> for Matriz {
 }
 
 #[cfg(test)]
-mod tests {
+mod tests_matriz {
     use super::Matriz;
 
     #[test]
