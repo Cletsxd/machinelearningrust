@@ -21,7 +21,7 @@ pub fn dot(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 		for j in 0..mat_b.columns() {
 			let mut sum = 0.0;
 			for k in 0..mat_a.columns() {
-				sum = mat_a.vector[(i*mat_a.columns())+k] * mat_b.vector[(k*mat_b.columns())+j] + sum;
+				sum = mat_a[(i, k)] * mat_b[(k, j)] + sum;
 			}
 			mat_r.vector[(i*mat_b.columns())+j] = sum;
 		}
@@ -41,7 +41,7 @@ pub fn suma_wc(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 
 	for i in 0..mat_a.rows() {
 		for j in 0..mat_a.columns() {
-			mat_r.vector[(i*mat_a.columns())+j] = mat_a.vector[(i*mat_a.columns())+j] + mat_b.vector[j];
+			mat_r.vector[(i*mat_a.columns())+j] = mat_a[(i, j)] + mat_b.vector[j];
 		}
 	}
 
@@ -59,7 +59,7 @@ pub fn resta_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 
 	for i in 0..mat_a.rows() {
 		for j in 0..mat_a.columns() {
-			mat_r.vector[(i*mat_a.columns())+j] = mat_a.vector[(i*mat_a.columns())+j] - mat_b.vector[(i*mat_a.columns())+j];
+			mat_r.vector[(i*mat_a.columns())+j] = mat_a[(i, j)] - mat_b.vector[(i*mat_a.columns())+j];
 		}
 	}
 
@@ -78,7 +78,7 @@ pub fn d_e2medio(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 
 	for i in 0..mat_a.rows() {
 		for j in 0..mat_a.columns() {
-			mat_r.vector[(i*mat_a.columns())+j] = mat_a.vector[(i*mat_a.columns())+j] - mat_b.vector[(i*mat_a.columns())+j];
+			mat_r.vector[(i*mat_a.columns())+j] = mat_a[(i, j)] - mat_b.vector[(i*mat_a.columns())+j];
 		}
 	}
 
@@ -96,7 +96,7 @@ pub fn mult_mat(mat_a: &Matriz, mat_b: &Matriz) -> Matriz {
 
 	for i in 0..mat_a.rows() {
 		for j in 0..mat_a.columns() {
-			mat_r.vector[(i*mat_a.columns())+j] = mat_a.vector[(i*mat_a.columns())+j] * mat_b.vector[(i*mat_a.columns())+j];
+			mat_r.vector[(i*mat_a.columns())+j] = mat_a[(i, j)] * mat_b.vector[(i*mat_a.columns())+j];
 		}
 	}
 
@@ -110,7 +110,7 @@ pub fn mean(mat: &Matriz) -> Matriz {
 
 	for i in 0..mat.rows() {
 		for j in 0..mat.columns() {
-			mat_r.vector[j] = mat.vector[(i*mat.columns())+j] + mat_r.vector[j];
+			mat_r.vector[j] = mat[(i, j)] + mat_r.vector[j];
 		}
 	}
 
@@ -128,7 +128,7 @@ pub fn mult_mat_float(mat: &Matriz, numberf: f32) -> Matriz {
 
 	for i in 0..mat.rows() {
 		for j in 0..mat.columns() {
-			mat_r.vector[(i*mat.columns())+j] = mat.vector[(i*mat.columns())+j] * numberf;
+			mat_r[(i, j)] = mat[(i, j)] * numberf;
 		}
 	}
 

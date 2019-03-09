@@ -18,7 +18,7 @@ impl Functions {
 			Functions::Sigmoidal => {
 				for i in 0..output.rows() {
 					for j in 0..output.columns() {
-						let val = -1_f32 * output.vector[(i*output.columns())+j];
+						let val = -1_f32 * output[(i, j)];
 						let exp_value = val.exp();
 						mat_r.vector[(i*output.columns())+j] = 1_f32/(1_f32+exp_value as f32);
 					}
@@ -28,7 +28,7 @@ impl Functions {
 			Functions::Tanh => {
 				for i in 0..output.rows() {
 					for j in 0..output.columns() {
-						mat_r.vector[(i*output.columns())+j] = output.vector[(i*output.columns())+j].tanh();
+						mat_r.vector[(i*output.columns())+j] = output[(i, j)].tanh();
 					}
 				}
 			},
@@ -36,8 +36,8 @@ impl Functions {
 			Functions::Relu => {
 				for i in 0..output.rows() {
 					for j in 0..output.columns() {
-						if output.vector[(i*output.columns())+j] > 0.0 {
-							mat_r.vector[(i*output.columns())+j] = output.vector[(i*output.columns())+j];
+						if output[(i, j)] > 0.0 {
+							mat_r.vector[(i*output.columns())+j] = output[(i, j)];
 						} else {
 							mat_r.vector[(i*output.columns())+j] = 0.0;
 						}
@@ -59,7 +59,7 @@ impl Functions {
 			Functions::Sigmoidal => {
 				for i in 0..output.rows() {
 					for j in 0..output.columns() {
-						mat_r.vector[(i*output.columns())+j] = output.vector[(i*output.columns())+j] * (1_f32 - output.vector[(i*output.columns())+j]);
+						mat_r.vector[(i*output.columns())+j] = output[(i, j)] * (1_f32 - output[(i, j)]);
 					}
 		  		}
 			},
@@ -68,7 +68,7 @@ impl Functions {
 				for i in 0..output.rows() {
 					for j in 0..output.columns() {
 						
-						mat_r.vector[(i*output.columns())+j] = 1_f32 - (output.vector[(i*output.columns())+j].powf(2_f32));
+						mat_r.vector[(i*output.columns())+j] = 1_f32 - (output[(i, j)].powf(2_f32));
 					}
 				}
 			},
@@ -76,7 +76,7 @@ impl Functions {
 			Functions::Relu => {
 				for i in 0..output.rows() {
 					for j in 0..output.columns() {
-						if output.vector[(i*output.columns())+j] > 0.0 {
+						if output[(i, j)] > 0.0 {
 							mat_r.vector[(i*output.columns())+j] = 1.0;
 						} else {
 							mat_r.vector[(i*output.columns())+j] = 0.0;
