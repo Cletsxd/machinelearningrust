@@ -155,17 +155,17 @@ impl NeuralNet {
         }
     }
 
-    pub fn backpropagation(&mut self, exp_input: &Matriz, learning_rate: f32) {
+    pub fn backpropagation(&mut self, exp_output: &Matriz, learning_rate: f32) {
         let ini = (-1 * self.neural_net.len() as i32) + 1;
-        let exp_input = exp_input.clone();
+        let exp_output = exp_output.clone();
 
         //- Para cada capa:
         for (i, j) in (ini..0).zip((ini + 1)..1) {
             //- Si es la última capa:
             if i == ini {
                 //- Calcular deltas última capa:
-                //> Calcular error (e2medio = output layer - exp_input)
-                let error = d_e2medio(&self.neural_net[(i * -1) as usize].output, &exp_input);
+                //> Calcular error (e2medio = output layer - exp_output)
+                let error = d_e2medio(&self.neural_net[(i * -1) as usize].output, &exp_output);
 
                 //> Calcular deriv output layer
                 let deriv = self.neural_net[(i * -1) as usize]
@@ -236,10 +236,10 @@ impl NeuralNet {
         }
     }
 
-    pub fn train(&mut self, exp_input: Matriz, epochs: usize, learning_rate: f32) {
+    pub fn train(&mut self, exp_output: Matriz, epochs: usize, learning_rate: f32) {
         for _i in 0..epochs {
             self.feed_forward();
-            self.backpropagation(&exp_input, learning_rate);
+            self.backpropagation(&exp_output, learning_rate);
         }
     }
 }
