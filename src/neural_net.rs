@@ -137,7 +137,13 @@ impl NeuralNet {
 
         for i in 1..self.neural_net.len() {
             // regresión lineal
-            let mut out = dot(&input, &self.neural_net[i].weights);
+            let mut out;
+
+            if i==1 {
+                out = dot(&input, &self.neural_net[i].weights);
+            } else {
+                out = dot(&self.neural_net[i - 1].output, &self.neural_net[i].weights);
+            }
 
             // suma con bias
             out = suma_wc(&out, &self.neural_net[i].bias);
