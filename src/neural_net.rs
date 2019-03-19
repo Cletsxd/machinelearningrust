@@ -120,7 +120,7 @@ impl NeuralNet {
         unimplemented!();
     }
 
-    // Pasa por la red neuronal hacia adelante
+    // Pasa por la red neuronal hacia adelante con entrada de entrenamiento
     pub fn feed_forward(&mut self) {
         for (i, j) in (0..self.neural_net.len()).zip(1..self.neural_net.len()) {
             // regresión lineal
@@ -245,7 +245,7 @@ impl NeuralNet {
     // Entrenamiento de la red neuronal
     pub fn train(&mut self, exp_output: Matriz, epochs: usize, learning_rate: f32) {
         print!("\nTraining...\n");
-        
+
         for _i in 0..epochs {
             self.feed_forward();
             self.backpropagation(&exp_output, learning_rate);
