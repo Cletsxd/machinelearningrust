@@ -77,29 +77,12 @@ fn main() {
     // Creación de la ANN
     let mut ann = NeuralNet::create_neural_net(layers, X, topo_nn);
 
-    // mostrar ann
-    /*ann.show();
-
-    // pensar (feed-forward)
-    ann.feed_forward();
-
-    // mostrar final output
-    print!("Final Output\n");
-    ann.show_final_output();*/
-
-    // mostrar todos los outputs
-    //ann.show_outputs();
-
     // Training
-    print!("\nTraining...\n");
     ann.train(Y.clone(), 15000, 0.03);
 
     // mostrar ann
     print!("\nNeural Net after training\n");
     ann.show();
-
-    // pensar (feed-forward)
-    ann.feed_forward();
 
     // mostrar final output
     print!("Final Output\n");

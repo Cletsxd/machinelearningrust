@@ -1,8 +1,8 @@
-// Incluye la capa de entrada, la cual solo tiene 'output', es decir, es la matriz del set de entrenamiento o de prueba
 use crate::functions::Functions;
 use crate::math::*;
 use crate::matriz::Matriz;
 
+// Incluye la capa de entrada, la cual solo tiene 'output', es decir, es la matriz del set de entrenamiento o de prueba
 #[derive(Clone)]
 struct NeuralLayer {
     weights: Matriz,
@@ -46,6 +46,7 @@ impl NeuralLayer {
     }
 }
 
+// Estructura de una Red Neuronal
 pub struct NeuralNet {
     layers: usize,
     neural_net: Vec<NeuralLayer>,
@@ -88,6 +89,7 @@ impl NeuralNet {
         NeuralNet { layers, neural_net }
     }
 
+    // Muestra los datos y estructura de la Red Neuronal
     pub fn show(&self) {
         for (i, layer) in self.neural_net.iter().enumerate() {
             if i == 0 {
@@ -106,6 +108,7 @@ impl NeuralNet {
         }
     }
 
+    // Muestra la salida de la red
     pub fn show_final_output(&self) {
         match self.neural_net.last() {
             Some(i) => i.output.show(),
@@ -117,6 +120,7 @@ impl NeuralNet {
         unimplemented!();
     }
 
+    // Pasa por la red neuronal hacia adelante
     pub fn feed_forward(&mut self) {
         for (i, j) in (0..self.neural_net.len()).zip(1..self.neural_net.len()) {
             // regresión lineal
@@ -132,13 +136,14 @@ impl NeuralNet {
         }
     }
 
+    // Pasa por la red neuronal hacia adelante con una entrada de prueba
     pub fn feed_forward_wi(&mut self, input: &Matriz) {
         let input = input.clone();
 
         for i in 1..self.neural_net.len() {
-            // regresión lineal
             let mut out;
 
+            // regresión lineal
             if i==1 {
                 out = dot(&input, &self.neural_net[i].weights);
             } else {
@@ -155,6 +160,7 @@ impl NeuralNet {
         }
     }
 
+    // Pasa por la red hacia atrás
     pub fn backpropagation(&mut self, exp_output: &Matriz, learning_rate: f32) {
         let ini = (-1 * self.neural_net.len() as i32) + 1;
         let exp_output = exp_output.clone();
@@ -236,7 +242,10 @@ impl NeuralNet {
         }
     }
 
+    // Entrenamiento de la red neuronal
     pub fn train(&mut self, exp_output: Matriz, epochs: usize, learning_rate: f32) {
+        print!("\nTraining...\n");
+        
         for _i in 0..epochs {
             self.feed_forward();
             self.backpropagation(&exp_output, learning_rate);
