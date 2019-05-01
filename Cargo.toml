@@ -6,3 +6,11 @@ edition = "2018"
 
 [dependencies]
 rand = "0.3"
+
+[[bin]]
+name = "main_neural_net"
+path = "src/main_neural_net.rs"
+
+[[bin]]
+name = "main_naive_bayes"
+path = "src/main_naive_bayes.rs"
